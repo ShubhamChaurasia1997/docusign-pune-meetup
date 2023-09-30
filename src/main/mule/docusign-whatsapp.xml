@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:docusign="http://www.mulesoft.org/schema/mule/docusign"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:kafka="http://www.mulesoft.org/schema/mule/kafka" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/kafka http://www.mulesoft.org/schema/mule/kafka/current/mule-kafka.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/docusign http://www.mulesoft.org/schema/mule/docusign/current/mule-docusign.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="181697a5-71a4-42c8-9353-e5078a2916e5" >
+		<http:listener-connection host="0.0.0.0" port="8082" tlsContext="TLS_Context" protocol="HTTPS"/>
+	</http:listener-config>
+	<tls:context name="TLS_Context" doc:name="TLS Context" doc:id="ddbf9c76-e197-454f-b424-199d60730c9c" >
+		<tls:key-store type="jks" path="DEV_PEGACMSD.jks" keyPassword="Alcobendas2021" password="Alcobendas2021"/>
+	</tls:context>
+	<http:request-config name="WhatsApp_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="01c79b36-b00c-43fb-8061-f011207996d7" >
+    <http:request-connection protocol="HTTPS" host="graph.facebook.com" />
+    <http:default-headers >
+      <http:default-header key="Authorization" value="Bearer &lt;Your Token&gt;" />
+    </http:default-headers>
+  </http:request-config>
+  <http:request-config name="DocuSign_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="2c778b6a-6a5d-4a49-8775-2863428489c3" >
+    <http:request-connection protocol="HTTPS" host="demo.docusign.net" />
+    <http:default-headers >
+      <http:default-header key="Authorization" value="Bearer eyJ0eXAiOiJNVCIsImFsZyI6IlJTMjU2Iiwia2lkIjoiNjgxODVmZjEtNGU1MS00Y2U5LWFmMWMtNjg5ODEyMjAzMzE3In0.AQoAAAABAAUABwAAIu2P08HbSAgAAGIQnhbC20gCACTY_V1hXvZFk9JEW8Erjl0VAAEAAAAYAAEAAAAFAAAADQAkAAAAZjRmNzM1MGUtYjgyNi00ZmFiLTk2MzEtYzU4ZGMwMTFhMzYyIgAkAAAAZjRmNzM1MGUtYjgyNi00ZmFiLTk2MzEtYzU4ZGMwMTFhMzYyMACAMGvCe8HbSDcAGGosc4G7ukWJGWp3RafjxQ.0wHi-FsmqjgF7VcvHrSkNRMRllgcpvODJPcxwtmF7VH4qPDjpz9xO-1eX8p4wOJZh8Ya2cvGprzUtDoFSfSCFLpgFrXsqdkStqQhZeFzn2WFhqY_iKDGNKdMj9ZHvtlGZ85PmbfQIWr3O8r9N5we7HvnEWyoRZOCBJWSGvuNbaJSv_ICmTGNWiCMJIIWEOsMVysTG61OmTqKBB_579xotbfa7TEhcPGHOUS1AtzCZfDbFa1wxDAhFCznilfwDwE5i6qdFwFI6YVL8s_lmPUmzq0EWiuCUuU6RveBGDSW5BFwfD7FlpSYd90C156-KcUyaCxynMG-7U4FGMBYbIDdFQ" />
+      <http:default-header key="Content-Type" value="application/json" />
+    </http:default-headers>
+  </http:request-config>
+  <file:config name="File_Config" doc:name="File Config" doc:id="c0ad36b6-a33c-475d-a23e-dd8a08e4a52b" >
+    <file:connection workingDir="C:\Users\shchaurasia\Downloads" />
+  </file:config>
+  <http:request-config name="pdf_api_http_request_config" doc:name="HTTP Request configuration" doc:id="dd8ff983-be3e-4d58-97a0-e522dcbd7106" >
+    <http:request-connection protocol="HTTPS" host="api.pdf.co" />
+    <http:default-headers >
+      <http:default-header key="x-api-key" value="myidhack20@gmail.com_1b2caabc244aa322c50e166109d9a76296e14776e4193e7c17af634d74e2a477f53ee70f" />
+    </http:default-headers>
+  </http:request-config>
+	<flow name="docusign-whatsappFlow" doc:id="f6209ac4-404f-4234-a247-704de12fd51c" >
+    <scheduler doc:name="Scheduler" doc:id="54a97b24-f4a7-4207-a3b4-a61d291023c8" >
+      <scheduling-strategy >
+        <fixed-frequency frequency="1" timeUnit="MINUTES"/>
+      </scheduling-strategy>
+    </scheduler>
+    <http:request method="GET" doc:name="Status Check" doc:id="c8eff514-bfe5-4d38-9834-9ac18d8525fb" config-ref="DocuSign_HTTP_Request_configuration" path="/restapi/v2.1/accounts/beda8988-0b1a-4a0a-9dd8-5f8f8967c3a4/envelopes/91311073-0709-4ae4-911c-b088dea58e8b"/>
+    <choice doc:name="Choice" doc:id="ddc98186-3e60-48bd-95a6-5ed2418235d0" >
+      <when expression="#[payload.status=='completed']">
+        <http:request method="GET" doc:name="Fetch PDF from Enveloper" doc:id="3d73f519-6085-4247-9af7-be4e8535e72d" config-ref="DocuSign_HTTP_Request_configuration" path="/restapi/v2.1/accounts/beda8988-0b1a-4a0a-9dd8-5f8f8967c3a4/envelopes/91311073-0709-4ae4-911c-b088dea58e8b/documents/123456"/>
+        <file:write doc:name="Write PDF" doc:id="727892f4-eade-4344-96b4-79270820913e" config-ref="File_Config" path="C:\Users\shchaurasia\Downloads\123.pdf" />
+        <file:read doc:name="Read PDF" doc:id="8c7ca3f4-a641-4e4b-9082-c408c238a1b4" config-ref="File_Config" path="123.pdf"/>
+        <ee:transform doc:name="transform toBase64" doc:id="9822c4a0-c22a-453d-99b2-b51ddd1b121c">
+          <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0
+import toBase64 from dw::core::Binaries
+output application/json
+---
+toBase64(payload)]]></ee:set-payload>
+          </ee:message>
+        </ee:transform>
+        <ee:transform doc:name="transform to multi-part form" doc:id="89b2d071-e81c-4536-9992-87fcfb4728b3">
+          <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0
+import dw::module::Multipart
+output multipart/form-data
+---
+{
+    parts: {
+        name: Multipart::field("name", "1234.pdf"),
+        file: Multipart::field("file", "data:application/pdf;base64,$(payload)")}
+}
+]]></ee:set-payload>
+          </ee:message>
+        </ee:transform>
+        <http:request method="POST" doc:name="PDF API Upload PDF" doc:id="de841476-d7e3-47c4-8b95-4b5389ee048a" config-ref="pdf_api_http_request_config" path="/v1/file/upload/base64" target="pdfUrl"/>
+        <ee:transform doc:name="whatsApp send msg request" doc:id="ffbfe906-7752-4003-98ac-8a8e1b05fd23">
+          <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "messaging_product": "whatsapp",
+    "recipient_type": "individual",
+  "to": "919169075698",
+  "type":"document",
+    "document": {
+    "link": vars.pdfUrl.url
+    }
+}]]></ee:set-payload>
+          </ee:message>
+        </ee:transform>
+        <http:request method="POST" doc:name="whatsapp send pdf" doc:id="fe005da4-5aad-467d-bb0f-037da9b7f866" config-ref="WhatsApp_HTTP_Request_configuration" path="/v16.0/108090912061280/messages" />
+      </when>
+      <otherwise >
+        <logger level="INFO" doc:name="Logger" doc:id="088087c7-65f0-4c97-abf5-73b52dcdf065" message="Document Not Signed"/>
+      </otherwise>
+    </choice>
+  </flow>
+</mule>
